@@ -182,7 +182,7 @@ local function create_feature_structure_workflow(project_path, feature_names_inp
 
   local lib_features_path = utils.path_join(project_path, "lib")
   -- Ensure the base features directory exists
-  local status, err = pcall(vim.fs.mkdir, lib_features_path, true)
+  local status, err = vim.fs.stat(lib_features_path) ~= nil
   if not status then
     notify_msg("Failed to create base features directory '" .. lib_features_path .. "': " .. err, vim.log.levels.ERROR)
     return false
