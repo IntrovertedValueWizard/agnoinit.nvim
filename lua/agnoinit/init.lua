@@ -201,29 +201,34 @@ local function create_feature_structure_workflow(project_path, feature_names_inp
       notify_msg("Creating structure for feature: " .. trimmed_feature, vim.log.levels.INFO)
       local success = create_folders(feature_base_path, config.feature_folder_template, feature_name_capitalized)
       if success then
-        -- Also create the presentation subfolders using dynamic names
-        local presentation_path = utils.path_join(feature_base_path, "presentation")
-        local add_path = utils.path_join(presentation_path, "add" .. feature_name_capitalized)
-        local edit_path = utils.path_join(presentation_path, "edit" .. feature_name_capitalized)
-        local list_path = utils.path_join(presentation_path, "list" .. feature_name_capitalized)
+            -- Also create the presentation subfolders using dynamic names
+            local presentation_path = utils.path_join(feature_base_path, "presentation")
+            local add_path = utils.path_join(presentation_path, "add" .. feature_name_capitalized)
+            local edit_path = utils.path_join(presentation_path, "edit" .. feature_name_capitalized)
+            local list_path = utils.path_join(presentation_path, "list" .. feature_name_capitalized)
 
-        if not vim.fs.mkdir(add_path, true) or not vim.fs.mkdir(edit_path, true) or not vim.fs.mkdir(list_path, true) then
-            notify_msg("Failed to create presentation subfolders for feature: " .. trimmed_feature, vim.log.levels.ERROR)
-            success = false
-        else
-            table.insert(created_paths, add_path)
-            table.insert(created_paths, edit_path)
-            table.insert(created_paths, list_path)
-        end
-        
-        if success then
-            notify_msg("Feature '" .. trimmed_feature .. "' structure created successfully.", vim.log.levels.INFO)
+            local add_status, add_err = pcall(vim.fs.mkdir, add_path, true)
+            local edit_status, edit_err = pcall(vim.fs.mkdir, edit_path, true)
+            local list_status, list_err = pcall(vim.fs.mkdir, list_path, true)
+
+            if not add_status or not edit_status or not list_status then
+                notify_msg("Failed to create presentation subfolders for feature: " .. trimmed_feature ..
+                           " (Add: " .. (add_err or "OK") .. ", Edit: " .. (edit_err or "OK") .. ", List: " .. (list_err or "OK") .. ")", vim.log.levels.ERROR)
+                success = false
+            else
+                table.insert(created_paths, add_path)
+                table.insert(created_paths, edit_path)
+                table.insert(created_paths, list_path)
+            end
+
+            if success then
+                notify_msg("Feature '" .. trimmed_feature .. "' structure created successfully.", vim.log.levels.INFO)
+            else
+                all_success = false -- Mark overall failure
+            end
         else
             all_success = false -- Mark overall failure
         end
-      else
-        all_success = false -- Mark overall failure
-      end
     end
   end
   return all_success
