@@ -174,13 +174,13 @@ end
 --- @param project_path string Absolute path to the project root.
 --- @param feature_names_input string Comma-separated feature names.
 --- @return boolean True on success, false on failure.
-local function create_feature_structure_workflow(project_path, feature_names_input)
+local function create_feature_structure_workflow(feature_names_input)
   if not feature_names_input or feature_names_input == "" then
     notify_msg("No feature names provided. Skipping feature creation.", vim.log.levels.WARN)
     return true
   end
 
-  local lib_features_path = utils.path_join(project_path)
+  local lib_features_path = vim.fn.getcwd()
   -- Ensure the base features directory exists
   local status, err = vim.fs.stat(lib_features_path) ~= nil
   if not status then
