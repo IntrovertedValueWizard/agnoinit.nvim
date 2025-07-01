@@ -8,32 +8,32 @@ Contributions are welcome! If you have suggestions for new features, improvement
 A Neovim plugin designed to streamline Flutter project setup, dependency management, and opinionated folder structure creation directly from your editor. AgnoInit helps you quickly scaffold new projects and maintain consistency across your existing Flutter codebase.
 ✨ Features
 
-    New Flutter Project Creation: Interactively create a new Flutter project, including:
+New Flutter Project Creation: Interactively create a new Flutter project, including:
 
-        flutter create execution.
+flutter create execution.
 
-        Automatic installation of a predefined set of common Flutter dependencies.
+Automatic installation of a predefined set of common Flutter dependencies.
 
-        Creation of a customizable "core" folder structure within lib/.
+Creation of a customizable "core" folder structure within lib/.
 
-        Interactive creation of "feature" specific folder structures (e.g., lib/features/User/, lib/features/Product/) with common subdirectories like data, domain, presentation.
+Interactive creation of "feature" specific folder structures (e.g., lib/features/User/, lib/features/Product/) with common subdirectories like data, domain, presentation.
 
-    Add Dependencies to Existing Projects: Easily add a predefined list of dependencies to any existing Flutter project's pubspec.yaml.
+Add Dependencies to Existing Projects: Easily add a predefined list of dependencies to any existing Flutter project's pubspec.yaml.
 
-    Create Core Folder Structure: Apply your defined core folder structure to an existing Flutter project's lib/ directory.
+Create Core Folder Structure: Apply your defined core folder structure to an existing Flutter project's lib/ directory.
 
-    Create Feature Folders: Generate feature-specific folder structures within lib/features/ for existing projects, promoting modularity.
+Create Feature Folders: Generate feature-specific folder structures within lib/features/ for existing projects, promoting modularity.
 
-    Configurable: Customize default dependencies, core structure, and feature templates via a simple Lua configuration.
+Configurable: Customize default dependencies, core structure, and feature templates via a simple Lua configuration.
 
-    Rollback Mechanism: Includes a basic cleanup mechanism for new project creation failures.
+Rollback Mechanism: Includes a basic cleanup mechanism for new project creation failures.
 
 🚀 Installation
 
 Install with your favorite package manager.
 
 lazy.nvim
-
+```
 {
   'introvertedvaluewizard/agnoinit.nvim',
   name = 'agnoinit',
@@ -60,9 +60,10 @@ lazy.nvim
     })
   end,
 }
+```
 
 packer.nvim
-
+```
 use {
   'introvertedvaluewizard/agnoinit.nvim',
   requires = {
@@ -76,23 +77,30 @@ use {
   end,
 }
 
+```
 vim-plug
 
+```
 Plug 'introvertedvaluewizard/agnoinit.nvim' 
 Plug 'nvim-lua/plenary.nvim'             
 
-" Lua configuration (put this in your init.lua or a separate file sourced from init.vim)
+```
+
+Lua configuration (put this in your init.lua or a separate file sourced from init.vim)
+```
 lua << EOF
 require('agnoinit').setup({
   -- Optional: Customize your configuration here
   -- project_base_dir = vim.fn.expand('~/Projects/Flutter'),
 })
 EOF
+```
 
 ⚙️ Configuration
 
-AgnoInit comes with sensible defaults, but you can customize its behavior by passing a table to the setup() function.
+AgnoInit comes with my setup, but you can customize its behavior by passing a table to the setup() function.
 
+```
 -- ~/.config/nvim/lua/your-config/agnoinit.lua
 require('agnoinit').setup({
   -- Base directory where new projects will be created.
@@ -158,6 +166,7 @@ require('agnoinit').setup({
     "presentation",
   },
 })
+```
 
 🚀 Usage
 
@@ -167,15 +176,15 @@ Once installed, simply run the main command:
 
 This will open an interactive vim.ui.select menu with the following options:
 
-    Set up a New Flutter Project: Guides you through creating a new project, installing dependencies, and setting up core and feature folders.
+Set up a New Flutter Project: Guides you through creating a new project, installing dependencies, and setting up core and feature folders.
 
-    Add Predefined Dependencies to an existing project: Installs the dependencies defined in your config.lua to the current Flutter project.
+Add Predefined Dependencies to an existing project: Installs the dependencies defined in your config.lua to the current Flutter project.
 
-    Create Core Folder structure in an existing project: Applies the core folder structure to the lib/ directory of your current project.
+Create Core Folder structure in an existing project: Applies the core folder structure to the lib/ directory of your current project.
 
-    Create Feature Folders in an existing project: Prompts for feature names and creates the corresponding modular folder structures within lib/features/.
+Create Feature Folders in an existing project: Prompts for feature names and creates the corresponding modular folder structures within lib/features/.
 
-    Exit: Closes the AgnoInit menu.
+Exit: Closes the AgnoInit menu.
 
 📄 License
 
