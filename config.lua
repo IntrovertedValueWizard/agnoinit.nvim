@@ -12,25 +12,8 @@ M.default_config = {
   -- This aligns with the list from our previous discussions
   dependencies = {
     flutter = {
-      "go_router",
-      "bloc",
-      "flutter_bloc",
-      "uuid",
-      "material_symbols_icons",
-      "sqflite_common_ffi",
-      "sqlite3_flutter_libs",
-      "path_provider",
-      "path",
-      "get_it",
-      "google_fonts",
-      "intl",
-      "equatable",
-      "dartz",
-      "flutter_launcher_icons",
-      "collection",
-      "shared_preferences",
-      "smooth_page_indicator",
-      "rxdart",
+    -- Add your regular dependencies in the setup func, with every project init, all the 
+    -- dependencies will be added automatically.
     },
     -- Add more frameworks and their dependencies here if needed in the future
     -- e.g., nodejs = { "express", "lodash" },
