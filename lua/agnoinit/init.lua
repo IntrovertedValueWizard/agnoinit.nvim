@@ -175,58 +175,66 @@ end
 --- @param feature_names_input string Comma-separated feature names.
 --- @return boolean True on success, false on failure.
 local function create_feature_structure_workflow(feature_names_input)
-  if not feature_names_input or feature_names_input == "" then
+  -- Exit early if no feature names are provided or if the input is just whitespace.
+  if not feature_names_input or feature_names_input:match("^%s*$") then
     notify_msg("No feature names provided. Skipping feature creation.", vim.log.levels.WARN)
     return true
   end
 
   local lib_features_path = vim.fn.getcwd()
-  -- Ensure the base features directory exists
-  local status, err = vim.fs.stat(lib_features_path) ~= nil
-  if not status then
-    notify_msg("Failed to create base features directory '" .. lib_features_path .. "': " .. err, vim.log.levels.ERROR)
-    return false
-  end
-  table.insert(created_paths, lib_features_path) -- Track for rollback
+  -- The current working directory is assumed to exist and be writable.
+  -- It's not a path created by this function, so it's not added to `created_paths` for rollback.
 
   local features = vim.split(feature_names_input, ",", { trimempty = true })
-  local all_success = true
+  local all_features_created_successfully = true
 
-  for _, feature in ipairs(features) do
-    local trimmed_feature = feature:gsub("^%s*(.-)%s*$", "%1") -- Trim whitespace
-    if trimmed_feature ~= "" then
-      local feature_name_capitalized = utils.capitalize_first_letter(trimmed_feature)
-      local feature_base_path = utils.path_join(lib_features_path, trimmed_feature)
-
-      notify_msg("Creating structure for feature: " .. trimmed_feature, vim.log.levels.INFO)
-      local success = create_folders(feature_base_path, config.feature_folder_template, feature_name_capitalized)
-      if success then
-        -- Also create the presentation subfolders using dynamic names
-        local presentation_path = utils.path_join(feature_base_path, "presentation")
-        local add_path = utils.path_join(presentation_path, "add" .. feature_name_capitalized)
-        local edit_path = utils.path_join(presentation_path, "edit" .. feature_name_capitalized)
-        local list_path = utils.path_join(presentation_path, "list" .. feature_name_capitalized)
-
-        if not vim.fs.mkdir(add_path, true) or not vim.fs.mkdir(edit_path, true) or not vim.fs.mkdir(list_path, true) then
-            notify_msg("Failed to create presentation subfolders for feature: " .. trimmed_feature, vim.log.levels.ERROR)
-            success = false
-        else
-            table.insert(created_paths, add_path)
-            table.insert(created_paths, edit_path)
-            table.insert(created_paths, list_path)
-        end
-        
-        if success then
-            notify_msg("Feature '" .. trimmed_feature .. "' structure created successfully.", vim.log.levels.INFO)
-        else
-            all_success = false -- Mark overall failure
-        end
-      else
-        all_success = false -- Mark overall failure
-      end
+  for _, feature_raw in ipairs(features) do
+    local feature_name = feature_raw:gsub("^%s*(.-)%s*$", "%1") -- Trim leading/trailing whitespace
+    if feature_name == "" then
+      goto next_feature -- Skip if the feature name becomes empty after trimming
     end
+
+    local feature_name_capitalized = utils.capitalize_first_letter(feature_name)
+    local feature_base_path = utils.path_join(lib_features_path, feature_name)
+
+    notify_msg("Creating structure for feature: " .. feature_name, vim.log.levels.INFO)
+
+    -- 1. Create core feature folders based on the template.
+    -- Assuming `create_folders` handles adding its created paths to `created_paths`.
+    if not create_folders(feature_base_path, config.feature_folder_template, feature_name_capitalized) then
+      notify_msg("Failed to create core folders for feature: " .. feature_name, vim.log.levels.ERROR)
+      all_features_created_successfully = false
+      goto next_feature -- Move to the next feature if core folder creation fails
+    end
+
+    -- 2. Create dynamic presentation subfolders.
+    local presentation_path = utils.path_join(feature_base_path, "presentation")
+    local presentation_subfolders = {"add", "edit", "list"}
+    local presentation_creation_success = true
+
+    for _, suffix in ipairs(presentation_subfolders) do
+      local subfolder_name = suffix .. feature_name_capitalized
+      local full_subfolder_path = utils.path_join(presentation_path, subfolder_name)
+
+      if not vim.fs.mkdir(full_subfolder_path, true) then
+        notify_msg("Failed to create presentation subfolder '" .. subfolder_name .. "' for feature: " .. feature_name, vim.log.levels.ERROR)
+        presentation_creation_success = false
+        break -- Stop processing presentation subfolders for this feature
+      end
+      table.insert(created_paths, full_subfolder_path) -- Track this newly created path
+    end
+
+    -- Update overall success status and provide final notification for the feature.
+    if not presentation_creation_success then
+      all_features_created_successfully = false
+    else
+      notify_msg("Feature '" .. feature_name .. "' structure created successfully.", vim.log.levels.INFO)
+    end
+
+    ::next_feature:: -- Label for `goto` to continue to the next iteration
   end
-  return all_success
+
+  return all_features_created_successfully
 end
 
 --- Workflow for creating a new Flutter project from scratch.
