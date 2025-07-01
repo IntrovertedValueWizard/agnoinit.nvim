@@ -13,7 +13,7 @@ M.default_config = {
   dependencies = {
     flutter = {
     -- Add your regular dependencies in the setup func, with every project init, all the 
-    -- dependencies will be added automatically.
+    -- dependencies will be added automatically, hopefully.
     },
     -- Add more frameworks and their dependencies here if needed in the future
     -- e.g., nodejs = { "express", "lodash" },
