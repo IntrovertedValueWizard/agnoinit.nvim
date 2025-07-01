@@ -180,7 +180,7 @@ local function create_feature_structure_workflow(project_path, feature_names_inp
     return true
   end
 
-  local lib_features_path = vim.fn.getcwd()
+  local lib_features_path = utils.path_join(project_path, "lib")
   -- Ensure the base features directory exists
   local status, err = pcall(vim.fs.mkdir, lib_features_path, true)
   if not status then
